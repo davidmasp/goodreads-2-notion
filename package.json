@@ -1,0 +1,24 @@
+{
+  "name": "goodreads-2-notion",
+  "version": "1.0.0",
+  "description": "Api integration to move your exported library to notion",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidmasp/goodreads-2-notion.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidmasp/goodreads-2-notion/issues"
+  },
+  "homepage": "https://github.com/davidmasp/goodreads-2-notion#readme",
+  "dependencies": {
+    "@notionhq/client": "^0.3.2",
+    "dotenv": "^10.0.0",
+    "fast-csv": "^4.3.6"
+  }
+}
