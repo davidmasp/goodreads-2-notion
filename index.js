@@ -18,7 +18,6 @@ const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 })
 
-
 function parseBookRow(row) {
   const bookObjRes = {}
   bookObjRes.id = row["Book Id"]
@@ -37,12 +36,27 @@ function parseBookRow(row) {
   return bookObjRes
 }
 
+async function getCurrentBooks(dbid){
+  (async () => {
+    const databaseId = dbid;
+    const response = await notion.databases.query({
+      database_id: databaseId});
+    console.log(response);
+    title_list = [];
+    response.results.forEach((page) => {
+       //this closes the page fun
+        title_list.push(page.properties.Name.title[0].text.content);
+      })();
+    // this closes main fun
+    })();
+    return title_list;
+}
+
 async function addPageToDb(dbid, bookObj) {
   return new Promise((resolve, reject) => {
     setTimeout(async () => {
       const book_icons = ["📗", "📘", "📙", "📕", "📚", "📖"];
       const icon_chosen = book_icons[Math.floor(Math.random() * book_icons.length)];
-      //console.log(bookObj);
       obj_to_create = {
         parent: {
           database_id: dbid,
@@ -91,11 +105,12 @@ async function addPageToDb(dbid, bookObj) {
       }
     }, 500);
   });
-  
 }
 
 const run = async () => {
   console.log('==> Reading csv ...');
+  const existing_books = await getCurrentBooks(process.env.NOTION_DB_ID); 
+  console.log(existing_books);
   const books_list = [];
   const readStream = fs.createReadStream(path.resolve(__dirname, 'data', 'goodreads_library_export.csv'))
     .pipe(csv.parse({ headers: true }))
@@ -106,10 +121,14 @@ const run = async () => {
     })
     .on('end', async rowCount => {
       for (let i = 0; i < books_list.length; i++) {
-        await addPageToDb(process.env.DB_ID,books_list[i]);
+        if (!existing_books.includes(books_list[i].title)) {
+          console.log(`==> Adding ${books_list[i].title} to Notion...`);
+          await addPageToDb(process.env.NOTION_DB_ID, books_list[i]);
+        }
       }
       console.log('==> End of script')
     })
 }
 
-run();
+//run();
+getCurrentBooks();
